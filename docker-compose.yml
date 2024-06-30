@@ -1,0 +1,28 @@
+services:
+  pgdb:
+    container_name: postgres
+    image: library/postgres:16-alpine
+    hostname: load
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: load
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  load-test:
+    build: .
+    container_name: load-test
+    ports:
+      - "8083:8083"
+    depends_on:
+      - pgdb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://load:5432/load
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+volumes:
+  db:
